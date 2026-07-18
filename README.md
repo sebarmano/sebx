@@ -70,7 +70,7 @@ Example `~/.gitconfig.local`:
 
 ```sh
 cd ~/projects/sebx
-gh repo create sebx --private --source=. --remote=origin --push
+gh repo create sebx --public --source=. --remote=origin --push
 ```
 
 ## Verification
