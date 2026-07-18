@@ -1,0 +1,57 @@
+# starship.toml — managed by sebx.
+# Full reference: https://starship.rs/config/
+
+"$schema" = 'https://starship.rs/config-schema.json'
+
+format = """
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_status\
+$nodejs\
+$python\
+$ruby\
+$golang\
+$cmd_duration\
+$line_break\
+$character"""
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol   = "[❯](bold red)"
+
+[directory]
+truncation_length = 4
+truncate_to_repo  = true
+style = "bold cyan"
+
+[git_branch]
+format = "[$symbol$branch]($style) "
+style  = "bold purple"
+
+[git_status]
+format = "([$all_status$ahead_behind]($style) )"
+style  = "bold yellow"
+
+[cmd_duration]
+min_time           = 2000
+format             = "[$duration]($style) "
+style              = "bold yellow"
+show_milliseconds  = false
+
+[nodejs]
+format = "[$symbol($version)]($style) "
+symbol = " "
+
+[python]
+format = "[$symbol$pyenv_prefix($version)]($style) "
+symbol = " "
+
+[golang]
+format = "[$symbol($version)]($style) "
+symbol = " "
+
+[ruby]
+format = "[$symbol($version)]($style) "
+symbol = " "
