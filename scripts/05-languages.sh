@@ -14,8 +14,10 @@ log "Installing language runtimes via mise …"
 
 # Add runtimes here. Each call is idempotent — mise skips already-active versions.
 mise use --global node@lts
-# mise use --global python@latest
-# mise use --global ruby@latest
+# TypeScript compiler as a global npm-backed tool (runs on the node runtime above)
+mise use --global npm:typescript@latest
+mise use --global ruby@latest
+mise use --global python@latest
 # mise use --global go@latest
 
 success "Language runtimes installed."
