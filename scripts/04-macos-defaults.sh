@@ -14,8 +14,9 @@ log "Writing macOS defaults …"
 defaults write NSGlobalDomain KeyRepeat -int 2
 # Shorter delay before key repeat kicks in (default 25)
 defaults write NSGlobalDomain InitialKeyRepeat -int 15
-# Use F1-F12 as standard function keys by default (no fn needed)
-defaults write NSGlobalDomain com.apple.keyboard.fnState -bool true
+# Use F1-F12 as media/feature keys (volume, brightness, etc.) by default;
+# hold fn for standard F1-F12 behavior
+defaults write NSGlobalDomain com.apple.keyboard.fnState -bool false
 # Disable press-and-hold accent picker in favor of key repeat (useful for vim)
 defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 
