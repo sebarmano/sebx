@@ -29,3 +29,13 @@ done
 
 success "All dotfile packages stowed."
 fancy_echo "Tip: On another machine, stow selectively: cd dotfiles && stow -t ~ nvim tmux"
+
+# ── tmux plugins (manual load — TPM has a name-conflict bug with catppuccin) ──
+CATPPUCCIN_DIR="${HOME}/.tmux/plugins/tmux"
+if [[ ! -d "$CATPPUCCIN_DIR" ]]; then
+  log "Cloning catppuccin/tmux into ${CATPPUCCIN_DIR} …"
+  git clone --depth 1 https://github.com/catppuccin/tmux.git "$CATPPUCCIN_DIR"
+  success "Cloned catppuccin/tmux."
+else
+  log "catppuccin/tmux already present at ${CATPPUCCIN_DIR} — skipping clone."
+fi
