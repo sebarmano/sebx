@@ -18,20 +18,31 @@ brew "mise"          # language version manager
 brew "starship"      # cross-shell prompt
 brew "wget"
 brew "tree"
+brew "lazygit"        # terminal git UI
+brew "pyenv"          # Python version manager
+brew "poetry"         # Python dependency manager
+
+# Terminal font (Nerd Font glyphs for tmux/Catppuccin icons):
+cask "font-jetbrains-mono-nerd-font"
 
 # ── GUI apps (casks) ────────────────────────────────────────────────────────
 cask "ghostty"            # terminal
 cask "visual-studio-code"
-cask "rectangle"          # window management
+cask "arc"
+cask "raycast"            # also handles window snapping/tiling
+cask "obsidian"
+cask "docker-desktop"
 
 # Uncomment / add your browser and other apps:
-# cask "arc"
 # cask "firefox"
 # cask "1password"
-# cask "raycast"
-# cask "obsidian"
 # cask "spotify"
+# cask "claude"           # Claude desktop chat app (not needed for Claude Code)
+# cask "codex"
+# brew "opencode"
 
 # ── Mac App Store (requires: brew "mas") ────────────────────────────────────
-# brew "mas"
-# mas "Xcode", id: 497799835
+# Mac App Store apps require you to already be signed into App Store.app
+# with the Apple ID that purchased them. `mas` cannot sign in for you.
+brew "mas"
+mas "Amphetamine", id: 937984704

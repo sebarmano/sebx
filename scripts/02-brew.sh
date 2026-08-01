@@ -18,7 +18,28 @@ fi
 log "Updating Homebrew …"
 brew update
 
-log "Installing from Brewfile …"
+log "Installing from Brewfile (Mac App Store apps need you already signed into App Store.app) …"
+set +e
 brew bundle --file="${REPO}/Brewfile"
+BUNDLE_STATUS=$?
+set -e
 
-success "Brew bundle complete."
+if [[ $BUNDLE_STATUS -eq 0 ]]; then
+  success "Brew bundle complete."
+  exit 0
+fi
+
+# Something didn't install — figure out whether it's just Mac App Store
+# apps (likely not signed in) or a real failure.
+UNMET="$(brew bundle check --file="${REPO}/Brewfile" --verbose 2>&1 || true)"
+NON_APP_UNMET="$(grep '^→' <<< "$UNMET" | grep -v '^→ App ' || true)"
+APP_UNMET="$(grep '^→ App ' <<< "$UNMET" || true)"
+
+if [[ -n "$APP_UNMET" && -z "$NON_APP_UNMET" ]]; then
+  warn "Mac App Store app(s) failed to install. You're probably not signed into App Store.app:"
+  printf '%s\n' "$APP_UNMET"
+  warn "Sign in to App Store.app, then run ./install.sh again to pick up the rest."
+else
+  err "Brew bundle failed. See output above."
+  exit 1
+fi
