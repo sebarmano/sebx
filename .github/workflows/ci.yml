@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Syntax check
+        run: bash -n install.sh scripts/*.sh lib/helpers.sh
+
+      - name: Install shellcheck and stow
+        run: sudo apt-get update && sudo apt-get install -y shellcheck stow
+
+      - name: Lint
+        run: shellcheck --severity=warning -x install.sh scripts/*.sh lib/helpers.sh
+
+      - name: Stow dry-run
+        run: |
+          cd dotfiles
+          stow -n -v -t ~ shell zsh git tmux nvim starship
+
+      - name: Smoke-test common.sh
+        run: bash -c 'source dotfiles/shell/.config/shell/common.sh && echo OK'
