@@ -6,7 +6,7 @@ configured dev environment. Safe to re-run at any time.
 ## What it does
 
 1. **Preflight** — installs Xcode CLT, Rosetta (Apple Silicon), and Homebrew.
-2. **Brew** — installs CLI tools and GUI apps from `Brewfile`.
+2. **Brew** — installs CLI tools and GUI apps from `Brewfile`. Mac App Store apps (via `mas`) need you to already be signed into App Store.app with the purchasing Apple ID; `mas` can't sign in for you, so those entries fail on a fresh machine until you do.
 3. **Dotfiles** — symlinks configs for zsh, git, tmux, neovim, and starship via GNU Stow.
 4. **macOS defaults** — applies sensible system tweaks (key repeat, screenshots, Finder, Dock).
 5. **Languages** — installs `node@lts` (and others you configure) via `mise`.
