@@ -66,6 +66,19 @@ brew bundle check --file=Brewfile
 cask "your-app"
 ```
 
+### Add a Mac App Store app (mas)
+```sh
+# Find the app's ID:
+# - If it's already installed: mdls -name kMDItemAppStoreAdamID "/Applications/App Name.app"
+# - Otherwise: mas search "App Name"
+
+# In Brewfile, under "# ── Mac App Store (requires: brew "mas")":
+mas "App Name", id: 123456789
+```
+Note: `mas` can't sign in on its own. The machine must already be signed into
+App Store.app with the Apple ID that purchased the app, or this entry fails silently
+on `brew bundle`.
+
 ### Add a dotfile package
 ```sh
 # 1. Create the package directory mirroring $HOME layout:
