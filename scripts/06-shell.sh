@@ -11,17 +11,25 @@ if is_macos; then
   # ── macOS: use Homebrew zsh as login shell ────────────────────────────
   ZSH_PATH="$(brew --prefix)/bin/zsh"
 
-  if ! grep -qF "$ZSH_PATH" /etc/shells; then
-    log "Adding ${ZSH_PATH} to /etc/shells …"
-    echo "$ZSH_PATH" | sudo tee -a /etc/shells
-  fi
-
-  if [[ "$SHELL" != "$ZSH_PATH" ]]; then
-    log "Changing login shell to ${ZSH_PATH} …"
-    chsh -s "$ZSH_PATH"
-    success "Login shell changed to ${ZSH_PATH}. Re-login to activate."
+  # Never point chsh at a binary that doesn't actually exist. A prior version
+  # of this script did exactly that when zsh was missing from the Brewfile,
+  # which locks every terminal app out entirely on next launch since they all
+  # exec the login shell to start a session.
+  if [[ ! -x "$ZSH_PATH" ]]; then
+    warn "Homebrew zsh not found at ${ZSH_PATH} (check it's in the Brewfile and 02-brew.sh has run). Leaving the login shell unchanged."
   else
-    success "Login shell already ${ZSH_PATH}."
+    if ! grep -qF "$ZSH_PATH" /etc/shells; then
+      log "Adding ${ZSH_PATH} to /etc/shells …"
+      echo "$ZSH_PATH" | sudo tee -a /etc/shells
+    fi
+
+    if [[ "$SHELL" != "$ZSH_PATH" ]]; then
+      log "Changing login shell to ${ZSH_PATH} …"
+      chsh -s "$ZSH_PATH"
+      success "Login shell changed to ${ZSH_PATH}. Re-login to activate."
+    else
+      success "Login shell already ${ZSH_PATH}."
+    fi
   fi
 
   # .zshrc is managed by stow (dotfiles/zsh/.zshrc); common.sh sourced within it.
