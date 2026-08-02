@@ -11,7 +11,7 @@ REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/helpers.sh
 source "${REPO}/lib/helpers.sh"
 
-trap 'err "sebx failed at line ${LINENO}. See output above."; exit 1' ERR
+trap 'err "sebx failed while running ${script:-install.sh}. See output above."; exit 1' ERR
 
 # ── Keyword → script mapping ─────────────────────────────────────────────────
 # Maps human-readable keywords to script filenames (partial match on basename).
@@ -40,9 +40,21 @@ if [[ $# -eq 0 ]]; then
     SCRIPTS+=("$script")
   done < <(find "${REPO}/scripts" -name '*.sh' | sort)
 else
+  # Command substitution (not process substitution) so resolve_scripts's exit
+  # status on an unknown keyword is actually visible here. Exiting inside a
+  # process substitution subshell only kills that subshell, not install.sh.
+  RESOLVED="$(resolve_scripts "$@")" || exit 1
   while IFS= read -r script; do
     SCRIPTS+=("$script")
-  done < <(resolve_scripts "$@")
+  done < <(printf '%s\n' "$RESOLVED")
+fi
+
+# Bash 3.2 (Apple's bundled /bin/bash) treats "${SCRIPTS[@]}" on a legitimately
+# empty array as an unbound variable under `set -u`. Guard before the loop
+# below ever expands it and fail with a clear message instead of a crash.
+if [[ ${#SCRIPTS[@]} -eq 0 ]]; then
+  err "No scripts to run."
+  exit 1
 fi
 
 # ── Run ──────────────────────────────────────────────────────────────────────
