@@ -35,7 +35,7 @@ shell config, dotfiles, language runtimes, and macOS system defaults from a sing
 | `dotfiles/git/.gitconfig` | Git config; includes ~/.gitconfig.local |
 | `dotfiles/git/.config/git/ignore` | Global gitignore |
 | `dotfiles/tmux/.config/tmux/tmux.conf` | tmux config |
-| `dotfiles/nvim/.config/nvim/init.lua` | Neovim config (placeholder) |
+| `dotfiles/nvim/.config/nvim/` | LazyVim config: Python (pyright+ruff+black), Ruby (ruby_lsp+standardrb), web/TS |
 | `dotfiles/starship/.config/starship.toml` | Starship prompt config |
 | `AGENTS.md` | This file — AI agent guide |
 | `CLAUDE.md` | Thin pointer to this file (Claude Code reads it) |
