@@ -18,6 +18,7 @@ brew "mise"          # language version manager
 brew "starship"      # cross-shell prompt
 brew "wget"
 brew "tree"
+brew "zsh"            # 06-shell.sh sets this as the login shell
 brew "lazygit"        # terminal git UI
 brew "pyenv"          # Python version manager
 brew "poetry"         # Python dependency manager
