@@ -34,15 +34,26 @@ alias gco="git checkout"
 alias gcm="git commit -m"
 
 # ── Tool initialisation ─────────────────────────────────────────────────────
+# Detect the actual running shell rather than trying "bash init" and falling
+# back to "zsh init" on failure: mise/zoxide/starship all happily emit
+# bash-flavored init code on request regardless of which shell asked for it,
+# so that fallback never actually triggers. Evaluating bash-only syntax
+# (e.g. zoxide's `shopt -s promptvars`) under zsh then breaks with
+# "command not found: shopt".
+if [ -n "${ZSH_VERSION:-}" ]; then
+  _SEBX_SHELL="zsh"
+elif [ -n "${BASH_VERSION:-}" ]; then
+  _SEBX_SHELL="bash"
+fi
 
 # mise (language version manager)
-if command -v mise >/dev/null 2>&1; then
-  eval "$(mise activate bash 2>/dev/null || mise activate zsh 2>/dev/null || true)"
+if [ -n "${_SEBX_SHELL:-}" ] && command -v mise >/dev/null 2>&1; then
+  eval "$(mise activate "$_SEBX_SHELL" 2>/dev/null)"
 fi
 
 # zoxide (smarter cd)
-if command -v zoxide >/dev/null 2>&1; then
-  eval "$(zoxide init bash 2>/dev/null || zoxide init zsh 2>/dev/null || true)"
+if [ -n "${_SEBX_SHELL:-}" ] && command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init "$_SEBX_SHELL" 2>/dev/null)"
   alias cd="z"
 fi
 
@@ -58,8 +69,8 @@ if command -v fzf >/dev/null 2>&1; then
 fi
 
 # starship prompt
-if command -v starship >/dev/null 2>&1; then
-  eval "$(starship init bash 2>/dev/null || starship init zsh 2>/dev/null || true)"
+if [ -n "${_SEBX_SHELL:-}" ] && command -v starship >/dev/null 2>&1; then
+  eval "$(starship init "$_SEBX_SHELL" 2>/dev/null)"
 fi
 
 # ── macOS Keychain exports (macOS only) ─────────────────────────────────────
