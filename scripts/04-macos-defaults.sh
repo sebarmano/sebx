@@ -7,6 +7,15 @@ source "${REPO}/lib/helpers.sh"
 
 is_macos || { warn "Not macOS — skipping defaults."; exit 0; }
 
+# Safari's defaults below need this terminal app to have Full Disk Access
+# (System Settings > Privacy & Security > Full Disk Access), unrelated to
+# whether Safari itself is running. Ask upfront instead of surprising the
+# user with a raw "Could not write domain ...; exiting" mid-run.
+fancy_echo "Note: Safari's defaults need this terminal app to have Full Disk Access (System Settings > Privacy & Security > Full Disk Access). Everything else below works without it."
+read -rp "[sebx] Attempt Safari's defaults too? [Y/n] " SAFARI_REPLY
+SKIP_SAFARI=false
+[[ "$SAFARI_REPLY" =~ ^[Nn] ]] && SKIP_SAFARI=true
+
 log "Writing macOS defaults …"
 
 # ── Keyboard ─────────────────────────────────────────────────────────────
@@ -73,18 +82,20 @@ defaults write com.apple.menuextra.clock DateFormat -string "EEE MMM d  h:mm:ss 
 # longer reliably drives every item after the Control Center rework.
 
 # ── Safari ────────────────────────────────────────────────────────────────
-# Safari's preferences live in a sandboxed container that macOS blocks
-# terminal apps from writing to unless they have Full Disk Access. Warn and
-# move on instead of crashing the rest of this script over it.
-set +e
-SAFARI_FAILED=0
-defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true || SAFARI_FAILED=1  # full URL in address bar
-defaults write com.apple.Safari IncludeDevelopMenu -bool true || SAFARI_FAILED=1             # Develop menu
-defaults write com.apple.Safari.SandboxBroker ShowDevelopMenu -bool true || SAFARI_FAILED=1
-set -e
+if [[ "$SKIP_SAFARI" == true ]]; then
+  warn "Skipping Safari's defaults by request. Grant Full Disk Access and re-run ./install.sh defaults to apply them later."
+else
+  # Still handled gracefully in case Full Disk Access wasn't actually granted.
+  set +e
+  SAFARI_FAILED=0
+  defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true || SAFARI_FAILED=1  # full URL in address bar
+  defaults write com.apple.Safari IncludeDevelopMenu -bool true || SAFARI_FAILED=1             # Develop menu
+  defaults write com.apple.Safari.SandboxBroker ShowDevelopMenu -bool true || SAFARI_FAILED=1
+  set -e
 
-if [[ $SAFARI_FAILED -eq 1 ]]; then
-  warn "Couldn't write Safari's defaults (needs Full Disk Access). Grant it to your terminal app in System Settings > Privacy & Security > Full Disk Access, then re-run ./install.sh defaults."
+  if [[ $SAFARI_FAILED -eq 1 ]]; then
+    warn "Couldn't write Safari's defaults (needs Full Disk Access). Grant it to your terminal app in System Settings > Privacy & Security > Full Disk Access, then re-run ./install.sh defaults."
+  fi
 fi
 
 # ── Apply ─────────────────────────────────────────────────────────────────
