@@ -33,6 +33,27 @@ alias gst="git status"
 alias gco="git checkout"
 alias gcm="git commit -m"
 
+# ── tmux session helper ──────────────────────────────────────────────────────
+# tat: attach to a tmux session named after the current directory, creating
+# it if it doesn't exist yet. One session per project, the way tmux is
+# meant to be used, instead of one session per terminal tab.
+if command -v tmux >/dev/null 2>&1; then
+  tat() {
+    if [ -n "$TMUX" ]; then
+      echo "Already inside a tmux session." >&2
+      return 1
+    fi
+
+    session_name=$(basename "$PWD" | tr . _)
+
+    if tmux has-session -t "=$session_name" 2>/dev/null; then
+      tmux attach-session -t "=$session_name"
+    else
+      tmux new-session -s "$session_name"
+    fi
+  }
+fi
+
 # ── Tool initialisation ─────────────────────────────────────────────────────
 # Detect the actual running shell rather than trying "bash init" and falling
 # back to "zsh init" on failure: mise/zoxide/starship all happily emit
