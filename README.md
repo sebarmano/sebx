@@ -12,6 +12,7 @@ configured dev environment. Safe to re-run at any time.
 5. **Languages** — installs `node@lts` (and others you configure) via `mise`.
 6. **Shell** — sets Homebrew zsh as the login shell; wires a shared `common.sh` layer.
 7. **Secrets** — guides you through storing API keys in macOS Keychain (never in the repo).
+8. **Claude Code** — installs it via Anthropic's own installer, since it isn't a brew package.
 
 ## Quick start (Mac)
 

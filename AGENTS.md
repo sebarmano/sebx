@@ -29,6 +29,7 @@ shell config, dotfiles, language runtimes, and macOS system defaults from a sing
 | `scripts/05-languages.sh` | Install language runtimes via mise |
 | `scripts/06-shell.sh` | Set login shell (Mac) / wire common.sh (Linux) |
 | `scripts/07-secrets.sh` | Provision secrets into macOS Keychain |
+| `scripts/08-claude-code.sh` | Install Claude Code (Anthropic's own installer, not brew) |
 | `dotfiles/shell/.config/shell/common.sh` | Shared POSIX aliases/exports/PATH/tool-init |
 | `dotfiles/zsh/.zshrc` | zsh config (Mac); sources common.sh + ~/.zshrc.local |
 | `dotfiles/git/.gitconfig` | Git config; includes ~/.gitconfig.local |
