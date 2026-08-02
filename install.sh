@@ -49,6 +49,7 @@ fi
 fancy_echo "sebx bootstrap — running %d script(s)" "${#SCRIPTS[@]}"
 
 for script in "${SCRIPTS[@]}"; do
+  ensure_brew_on_path
   log "Running $(basename "$script") …"
   bash "$script"
 done
