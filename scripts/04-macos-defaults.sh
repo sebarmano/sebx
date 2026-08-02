@@ -73,11 +73,19 @@ defaults write com.apple.menuextra.clock DateFormat -string "EEE MMM d  h:mm:ss 
 # longer reliably drives every item after the Control Center rework.
 
 # ── Safari ────────────────────────────────────────────────────────────────
-# Show full URL in the address bar
-defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true
-# Enable the Develop menu
-defaults write com.apple.Safari IncludeDevelopMenu -bool true
-defaults write com.apple.Safari.SandboxBroker ShowDevelopMenu -bool true
+# Safari's preferences live in a sandboxed container that macOS blocks
+# terminal apps from writing to unless they have Full Disk Access. Warn and
+# move on instead of crashing the rest of this script over it.
+set +e
+SAFARI_FAILED=0
+defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true || SAFARI_FAILED=1  # full URL in address bar
+defaults write com.apple.Safari IncludeDevelopMenu -bool true || SAFARI_FAILED=1             # Develop menu
+defaults write com.apple.Safari.SandboxBroker ShowDevelopMenu -bool true || SAFARI_FAILED=1
+set -e
+
+if [[ $SAFARI_FAILED -eq 1 ]]; then
+  warn "Couldn't write Safari's defaults (needs Full Disk Access). Grant it to your terminal app in System Settings > Privacy & Security > Full Disk Access, then re-run ./install.sh defaults."
+fi
 
 # ── Apply ─────────────────────────────────────────────────────────────────
 killall Dock Finder SystemUIServer 2>/dev/null || true
