@@ -15,12 +15,13 @@ if ! command_exists brew; then
   exit 1
 fi
 
-log "Updating Homebrew …"
+log "Updating Homebrew (on a fresh install this clones the package index and can sit quiet for a couple of minutes, that's normal, not stuck) …"
 brew update
 
 log "Installing from Brewfile (Mac App Store apps need you already signed into App Store.app) …"
+fancy_echo "Large casks (Docker, VS Code, etc.) can go quiet for a few minutes mid-download — still working."
 set +e
-brew bundle --file="${REPO}/Brewfile"
+brew bundle --file="${REPO}/Brewfile" --verbose
 BUNDLE_STATUS=$?
 set -e
 
