@@ -31,11 +31,18 @@ resolve_scripts() {
 }
 
 # ── Determine which scripts to run ───────────────────────────────────────────
+# Avoid `mapfile` (bash 4+): on a fresh Mac this runs on Apple's bundled
+# bash 3.2 before Homebrew's own bash is installed.
 declare -a SCRIPTS
+SCRIPTS=()
 if [[ $# -eq 0 ]]; then
-  mapfile -t SCRIPTS < <(find "${REPO}/scripts" -name '*.sh' | sort)
+  while IFS= read -r script; do
+    SCRIPTS+=("$script")
+  done < <(find "${REPO}/scripts" -name '*.sh' | sort)
 else
-  mapfile -t SCRIPTS < <(resolve_scripts "$@")
+  while IFS= read -r script; do
+    SCRIPTS+=("$script")
+  done < <(resolve_scripts "$@")
 fi
 
 # ── Run ──────────────────────────────────────────────────────────────────────
