@@ -29,6 +29,40 @@ defaults write NSGlobalDomain com.apple.keyboard.fnState -bool false
 # Disable press-and-hold accent picker in favor of key repeat (useful for vim)
 defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 
+# Caps Lock -> Control. `defaults write` can't do this reliably; the legacy
+# mechanism is keyed per physical keyboard device ID, not portable across
+# machines. hidutil remaps hardware-agnostically for every connected
+# keyboard, but doesn't persist across reboots on its own, so a LaunchAgent
+# reapplies it on every login.
+CAPSLOCK_MAPPING='{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x7000000E0}]}'
+CAPSLOCK_AGENT="${HOME}/Library/LaunchAgents/com.sebx.capslock-remap.plist"
+
+hidutil property --set "$CAPSLOCK_MAPPING" >/dev/null
+
+mkdir -p "$(dirname "$CAPSLOCK_AGENT")"
+cat > "$CAPSLOCK_AGENT" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.sebx.capslock-remap</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/hidutil</string>
+    <string>property</string>
+    <string>--set</string>
+    <string>${CAPSLOCK_MAPPING}</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+</dict>
+</plist>
+PLIST
+
+launchctl bootout "gui/$(id -u)" "$CAPSLOCK_AGENT" 2>/dev/null || true
+launchctl bootstrap "gui/$(id -u)" "$CAPSLOCK_AGENT"
+
 # ── Screenshots ───────────────────────────────────────────────────────────
 mkdir -p "${HOME}/Screenshots"
 defaults write com.apple.screencapture location -string "${HOME}/Screenshots"
@@ -54,6 +88,7 @@ defaults write com.apple.finder NewWindowTarget -string "PfHm"
 defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
 
 # ── Dock ──────────────────────────────────────────────────────────────────
+defaults write com.apple.dock orientation -string "left"
 defaults write com.apple.dock autohide -bool true
 defaults write com.apple.dock autohide-delay -float 0
 defaults write com.apple.dock show-recents -bool false
