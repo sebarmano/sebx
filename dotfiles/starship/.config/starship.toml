@@ -1,57 +1,176 @@
 # starship.toml — managed by sebx.
+# Palette is Catppuccin Mocha, matching the tmux status bar and Ghostty theme.
+# Nerd Font glyphs below require the terminal font to be a Nerd Font
+# (Ghostty is set to "JetBrainsMono Nerd Font Mono" — see Brewfile).
 # Full reference: https://starship.rs/config/
 
 "$schema" = 'https://starship.rs/config-schema.json'
 
+palette = "catppuccin_mocha"
+add_newline = true
+
+# Left side: where am I + what is git doing.
+# Right side ($fill pushes it over): toolchain versions + how long that took.
 format = """
 $username\
 $hostname\
 $directory\
 $git_branch\
+$git_state\
 $git_status\
+$fill\
 $nodejs\
 $python\
 $ruby\
 $golang\
+$rust\
 $cmd_duration\
 $line_break\
+$jobs\
+$status\
 $character"""
 
+[fill]
+symbol = " "
+style  = "surface0"
+
+# ── Prompt character ─────────────────────────────────────────────────────────
 [character]
 success_symbol = "[❯](bold green)"
 error_symbol   = "[❯](bold red)"
+vimcmd_symbol  = "[❮](bold peach)"
 
+# ── Location ─────────────────────────────────────────────────────────────────
+# truncate_to_repo keeps repo-relative paths short; the repo name still leads,
+# so two tmux sessions in different projects never look identical.
 [directory]
+format            = "[$path]($style)[$read_only]($read_only_style) "
+style             = "bold blue"
 truncation_length = 4
 truncate_to_repo  = true
-style = "bold cyan"
+truncation_symbol = "…/"
+read_only         = " 󰌾"
+read_only_style   = "red"
 
+[username]
+format      = "[$user]($style)[@](overlay1)"
+style_user  = "bold lavender"
+style_root  = "bold red"
+show_always = false
+
+[hostname]
+ssh_only   = true
+ssh_symbol = " "
+format     = "[$ssh_symbol$hostname]($style) "
+style      = "bold teal"
+
+# ── Git ──────────────────────────────────────────────────────────────────────
 [git_branch]
 format = "[$symbol$branch]($style) "
-style  = "bold purple"
-
-[git_status]
-format = "([$all_status$ahead_behind]($style) )"
-style  = "bold yellow"
-
-[cmd_duration]
-min_time           = 2000
-format             = "[$duration]($style) "
-style              = "bold yellow"
-show_milliseconds  = false
-
-[nodejs]
-format = "[$symbol($version)]($style) "
 symbol = " "
+style  = "bold mauve"
+
+# Surfaces mid-rebase / mid-merge / mid-bisect state, which is easy to forget.
+[git_state]
+format = "[\\($state( $progress_current/$progress_total)\\)]($style) "
+style  = "bold peach"
+
+# Each status kind gets its own colour and a count, instead of one yellow blob
+# of unlabelled symbols.
+[git_status]
+format     = "([$all_status$ahead_behind]($style))"
+style      = "yellow"
+conflicted = "[~${count}](bold red) "
+staged     = "[+${count}](bold green) "
+modified   = "[!${count}](bold yellow) "
+deleted    = "[-${count}](bold red) "
+renamed    = "[»${count}](bold blue) "
+untracked  = "[?${count}](overlay1) "
+stashed    = "[\\$${count}](sky) "
+ahead      = "[⇡${count}](bold green) "
+behind     = "[⇣${count}](bold yellow) "
+diverged   = "[⇡${ahead_count}⇣${behind_count}](bold peach) "
+
+# ── Toolchains (right-aligned, dimmer than the git/location info) ────────────
+[nodejs]
+format = "[$symbol($version) ]($style)"
+symbol = " "
+style  = "green"
 
 [python]
-format = "[$symbol$pyenv_prefix($version)]($style) "
+format = "[$symbol($version )(\\($virtualenv\\) )]($style)"
 symbol = " "
-
-[golang]
-format = "[$symbol($version)]($style) "
-symbol = " "
+style  = "yellow"
 
 [ruby]
-format = "[$symbol($version)]($style) "
+format = "[$symbol($version) ]($style)"
 symbol = " "
+style  = "red"
+
+[golang]
+format = "[$symbol($version) ]($style)"
+symbol = " "
+style  = "sky"
+
+[rust]
+format = "[$symbol($version) ]($style)"
+symbol = " "
+style  = "peach"
+
+# ── Feedback ─────────────────────────────────────────────────────────────────
+[cmd_duration]
+min_time          = 2000
+format            = "[󰔟 $duration]($style)"
+style             = "subtext0"
+show_milliseconds = false
+
+# Backgrounded jobs are otherwise invisible until you trip over them.
+[jobs]
+format           = "[$symbol$number]($style) "
+symbol           = "󰜎 "
+style            = "bold sapphire"
+number_threshold = 1
+
+# A red ❯ tells you something failed but not what; this shows the code/signal.
+[status]
+disabled              = false
+format                = "[$symbol$status]($style) "
+style                 = "bold red"
+map_symbol            = true
+pipestatus            = true
+# Nerd Font glyphs instead of starship's default emoji, which are
+# double-width and sit badly next to the rest of the prompt.
+symbol                = "✘ "
+sigint_symbol         = " "
+signal_symbol         = " "
+not_found_symbol      = " "
+not_executable_symbol = " "
+
+# ── Catppuccin Mocha palette ─────────────────────────────────────────────────
+[palettes.catppuccin_mocha]
+rosewater = "#f5e0dc"
+flamingo  = "#f2cdcd"
+pink      = "#f5c2e7"
+mauve     = "#cba6f7"
+red       = "#f38ba8"
+maroon    = "#eba0ac"
+peach     = "#fab387"
+yellow    = "#f9e2af"
+green     = "#a6e3a1"
+teal      = "#94e2d5"
+sky       = "#89dceb"
+sapphire  = "#74c7ec"
+blue      = "#89b4fa"
+lavender  = "#b4befe"
+text      = "#cdd6f4"
+subtext1  = "#bac2de"
+subtext0  = "#a6adc8"
+overlay2  = "#9399b2"
+overlay1  = "#7f849c"
+overlay0  = "#6c7086"
+surface2  = "#585b70"
+surface1  = "#45475a"
+surface0  = "#313244"
+base      = "#1e1e2e"
+mantle    = "#181825"
+crust     = "#11111b"
