@@ -1,13 +1,22 @@
 # starship.toml — managed by sebx.
 # Palette is Catppuccin Mocha, matching the tmux status bar and Ghostty theme.
-# Nerd Font glyphs below require the terminal font to be a Nerd Font
-# (Ghostty is set to "JetBrainsMono Nerd Font Mono" — see Brewfile).
-# Full reference: https://starship.rs/config/
+#
+# Nerd Font glyphs are written as TOML \u / \U escapes, never as literal
+# characters. Most of them live in the Private Use Area, where they are a
+# single unlabelled codepoint that editors, clipboards and diff tools happily
+# eat — that is exactly how every BMP-PUA symbol in this file silently became
+# a plain space once already. Escapes survive that; literals do not.
+# Glyph codepoints: https://www.nerdfonts.com/cheat-sheet
+# Full reference:   https://starship.rs/config/
 
 "$schema" = 'https://starship.rs/config-schema.json'
 
 palette = "catppuccin_mocha"
 add_newline = true
+
+# Starship kills a module that takes longer than this and prints a warning in
+# its place. The 500ms default trips on large repos mid-fetch; 1s does not.
+command_timeout = 1000
 
 # Left side: where am I + what is git doing.
 # Right side ($fill pushes it over): toolchain versions + how long that took.
@@ -31,14 +40,14 @@ $status\
 $character"""
 
 [fill]
-symbol = " "
+symbol = " "   # literal space, intentionally — this one is not a glyph
 style  = "surface0"
 
 # ── Prompt character ─────────────────────────────────────────────────────────
 [character]
-success_symbol = "[❯](bold green)"
-error_symbol   = "[❯](bold red)"
-vimcmd_symbol  = "[❮](bold peach)"
+success_symbol = "[\u276F](bold green)"   # ❯
+error_symbol   = "[\u276F](bold red)"     # ❯
+vimcmd_symbol  = "[\u276E](bold peach)"   # ❮
 
 # ── Location ─────────────────────────────────────────────────────────────────
 # truncate_to_repo keeps repo-relative paths short; the repo name still leads,
@@ -48,8 +57,8 @@ format            = "[$path]($style)[$read_only]($read_only_style) "
 style             = "bold blue"
 truncation_length = 4
 truncate_to_repo  = true
-truncation_symbol = "…/"
-read_only         = " 󰌾"
+truncation_symbol = "\u2026/"            # …/
+read_only         = " \U000F033E"        # 󰌾 lock
 read_only_style   = "red"
 
 [username]
@@ -60,14 +69,14 @@ show_always = false
 
 [hostname]
 ssh_only   = true
-ssh_symbol = " "
+ssh_symbol = "\uEB01 "                   #  remote
 format     = "[$ssh_symbol$hostname]($style) "
 style      = "bold teal"
 
 # ── Git ──────────────────────────────────────────────────────────────────────
 [git_branch]
 format = "[$symbol$branch]($style) "
-symbol = " "
+symbol = "\uE0A0 "                       #  branch
 style  = "bold mauve"
 
 # Surfaces mid-rebase / mid-merge / mid-bisect state, which is easy to forget.
@@ -84,67 +93,68 @@ conflicted = "[~${count}](bold red) "
 staged     = "[+${count}](bold green) "
 modified   = "[!${count}](bold yellow) "
 deleted    = "[-${count}](bold red) "
-renamed    = "[»${count}](bold blue) "
+renamed    = "[\u00BB${count}](bold blue) "
 untracked  = "[?${count}](overlay1) "
 stashed    = "[\\$${count}](sky) "
-ahead      = "[⇡${count}](bold green) "
-behind     = "[⇣${count}](bold yellow) "
-diverged   = "[⇡${ahead_count}⇣${behind_count}](bold peach) "
+ahead      = "[\u21E1${count}](bold green) "                       # ⇡
+behind     = "[\u21E3${count}](bold yellow) "                      # ⇣
+diverged   = "[\u21E1${ahead_count}\u21E3${behind_count}](bold peach) "
 
 # ── Toolchains (right-aligned, dimmer than the git/location info) ────────────
 [nodejs]
 format = "[$symbol($version) ]($style)"
-symbol = " "
+symbol = "\uE718 "                       #  node
 style  = "green"
 
 [python]
 format = "[$symbol($version )(\\($virtualenv\\) )]($style)"
-symbol = " "
+symbol = "\uE235 "                       #  python
 style  = "yellow"
 
 [ruby]
 format = "[$symbol($version) ]($style)"
-symbol = " "
+symbol = "\uE791 "                       #  ruby
 style  = "red"
 
 [golang]
 format = "[$symbol($version) ]($style)"
-symbol = " "
+symbol = "\uE627 "                       #  go
 style  = "sky"
 
 [rust]
 format = "[$symbol($version) ]($style)"
-symbol = " "
+symbol = "\uE7A8 "                       #  rust
 style  = "peach"
 
 # ── Feedback ─────────────────────────────────────────────────────────────────
 [cmd_duration]
 min_time          = 2000
-format            = "[󰔟 $duration]($style)"
+format            = "[\U000F051F $duration]($style)"   # 󰔟 timer
 style             = "subtext0"
 show_milliseconds = false
 
 # Backgrounded jobs are otherwise invisible until you trip over them.
 [jobs]
 format           = "[$symbol$number]($style) "
-symbol           = "󰜎 "
+symbol           = "\U000F070E "         # 󰜎 gear
 style            = "bold sapphire"
 number_threshold = 1
 
-# A red ❯ tells you something failed but not what; this shows the code/signal.
+# Off: the red ❯ is the only failure indicator. Flip to false to also show the
+# exit code/signal in front of it.
 [status]
-disabled              = false
+disabled              = true
 format                = "[$symbol$status]($style) "
 style                 = "bold red"
 map_symbol            = true
 pipestatus            = true
 # Nerd Font glyphs instead of starship's default emoji, which are
 # double-width and sit badly next to the rest of the prompt.
-symbol                = "✘ "
-sigint_symbol         = " "
-signal_symbol         = " "
-not_found_symbol      = " "
-not_executable_symbol = " "
+symbol                = "\u2718 "        # ✘ generic failure
+sigint_symbol         = "\uF256 "        #  hand — interrupted (^C)
+signal_symbol         = "\uF0E7 "        #  bolt — killed by a signal
+not_found_symbol      = "\uF002 "        #  magnifier — command not found
+not_executable_symbol = "\uF05E "        #  ban — found but not executable
 
 # ── Catppuccin Mocha palette ─────────────────────────────────────────────────
 [palettes.catppuccin_mocha]
